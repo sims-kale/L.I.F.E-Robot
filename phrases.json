@@ -1,0 +1,37 @@
+{
+  "priorities": {
+    "H": {
+      "label": "Harmed victim",
+      "voice_lines": [
+        "This is serious. Immediate assistance required.",
+        "The situation is critical. Quick action needed.",
+        "Severe injuries detected. Deploy medical support now."
+      ],
+      "urgency": "High priority situation. Act immediately."
+    },
+    "U": {
+      "label": "Unharmed victim",
+      "voice_lines": [
+        "Victim appears stable but needs evacuation.",
+        "They're okay, but assistance would be helpful.",
+        "Requesting escort for an uninjured survivor."
+      ],
+      "urgency": "Low urgency, but guidance required."
+    },
+    "S": {
+      "label": "Stable victim",
+      "voice_lines": [
+        "Condition is steady. Monitoring continues.",
+        "No major injuries detected, but observation advised.",
+        "Victim seems fine. Keep them calm and reassured."
+      ],
+      "urgency": "No immediate action required."
+    }
+  },
+  "hazards": {
+    "Flammable Gas": "Warning: Flammable gas in the area. Extreme caution advised.",
+    "Organic Peroxide": "Organic peroxide hazard detected. This can be unstable.",
+    "Corrosive": "Corrosive material nearby. Avoid contact.",
+    "Poison": "Toxic presence confirmed. Respiratory danger possible."
+  }
+}
