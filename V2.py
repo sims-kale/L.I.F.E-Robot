@@ -108,19 +108,35 @@ class ErebusInference:
 
         self.speaker = self.robot.getDevice("speaker")
         self.language = 'en'
+        self.report_audio_end_time = 0 
         self.audio_folder = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/reports_audio"
         os.makedirs(self.audio_folder, exist_ok=True)
         self.csv_path = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/victim_report.csv"
         self.reported_hashes = set()
         with open(r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/phrases.json", "r") as f:
             self.phrases_data = json.load(f)
-        if not os.path.exists(self.csv_path):
-            with open(self.csv_path, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(["X (m)", "Z (m)", "Type", "Priority", "Hazard", "Proximity (m)", "Timestamp", "Area_Code", "Urgency_Message", "Zone"])
+        # if not os.path.exists(self.csv_path):
+        with open(self.csv_path, mode='w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["X (m)", "Z (m)", "Type", "Priority", "Hazard", "Proximity (m)", "Timestamp", "Area_Code", "Urgency_Message", "Zone"])
 
+    def get_position(self):
+        gps = self.robot.getDevice("gps")
+        return gps.getValues()[0], gps.getValues()[2]
+    
+    def run_path_following(self):
+        print("Starting path following mode")
+        self.path_following = True
+        path_completed = self.path_follower.run()
+        self.path_following = False
+        return path_completed
 
-    def report_victim(self, x_cm, z_cm, type_code, hazard_tag, count):
+    def report_victim(self, x_cm, z_cm, type_code, hazard_tag, urgency_msg,voice_message, count):
+        # with open(self.csv_path, mode='a', newline='') as file:
+        #     writer = csv.writer(file)
+        #     writer.writerow([
+        #         x_m, z_m, type_code, priority, hazard_tag or "None", proximity_m, timestamp, area_code, urgency_msg, zone
+        #     ])
         x_m = round(x_cm / 100.0, 2)
         z_m = round(z_cm / 100.0, 2)
         pos_hash = f"{x_m}_{z_m}_{type_code}"
@@ -145,7 +161,7 @@ class ErebusInference:
         def hazard_phrase(hazard_tag):
             return self.phrases_data["hazards"].get(hazard_tag, "")
 
-        priority, message_line, urgency = classify_priority(type_code)
+        priority, message_line, urgency_msg = classify_priority(type_code)
         timestamp = datetime.now().strftime("%m/%d/%Y %H:%M")
         area_code = f"Area_Code{count}"
         zone = f"Zone-{(count % 3) + 1}"
@@ -157,14 +173,14 @@ class ErebusInference:
 
         with open(self.csv_path, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([x_m, z_m, type_code, priority, hazard_tag or "None", proximity_m, timestamp, area_code, urgency, zone])
+            writer.writerow([x_m, z_m, type_code, priority, hazard_tag or "None", proximity_m, timestamp, area_code, urgency_msg, zone])
 
         voice_lines = [
             f"{message_line} Victim located at {x_m} and {z_m} meters.",
             f"Classification: {priority}.",
             f"Distance from robot: {proximity_m} meters.",
             hazard_phrase(hazard_tag),
-            urgency
+            urgency_msg
         ]
         voice_message = " ".join([line for line in voice_lines if line])
 
@@ -174,7 +190,8 @@ class ErebusInference:
         audio = MP3(mp3_path)
         duration = audio.info.length
         self.speaker.playSound(self.speaker, self.speaker, mp3_path, 1.0, 1.0, 0.0, False)
-        time.sleep(duration)
+        self.report_audio_end_time = self.robot.getTime() + duration
+        # time.sleep(duration)
 
         # ------------------------------------
 
@@ -213,7 +230,25 @@ class ErebusInference:
             self.right_motor.setVelocity(MAX_VELOCITY * 0.3)
 
     def run(self):
-        while self.robot.step(self.timestep) != -1:
+        # last_report_time = self.robot.getTime()
+        # victim_count = 1
+        # while self.robot.step(self.timestep) != -1 and not self.reached_target:
+        # --------------------------------------
+        last_report_time = self.robot.getTime()
+        victim_count = 1
+        victim_types = ['U', 'S', 'M']  # Add more types as needed
+        while self.robot.step(self.timestep) != -1 and not self.reached_target:
+            current_time = self.robot.getTime()
+            # Report a different victim type every 10 seconds
+            if current_time - last_report_time > 10:
+                x, z = self.get_position()
+                type_code = victim_types[(victim_count - 1) % len(victim_types)]
+                hazard_tag = None
+                urgency_msg = None
+                self.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, victim_count)
+                victim_count += 1
+                last_report_time = current_time
+            # -------------------------------------
             if self.path_index >= len(self.path_data['path']):
                 print("Path completed!")
                 self.left_motor.setVelocity(0)
@@ -527,9 +562,9 @@ class ErebusController:
             print("VICTIM DETECTED! Reporting...")
             self.stop()
             x, z = self.get_position()
-            # Example: type_code and hazard_tag can be set based on your detection logic or fixed
+            # Assuming type_code and hazard_tag are determined based on context
             type_code = 'U'  # Unknown, or set based on context
-            hazard_tag = None  # Or set if you have hazard detection
+            hazard_tag = 'Poission'
             count = len(self.reported_hashes) + 1
             self.report_victim(x * 100, z * 100, type_code, hazard_tag, count)
             start_pause = self.robot.getTime()
@@ -632,8 +667,37 @@ class ErebusController:
             print("No path steps available, using normal navigation")
             print("You can record a path by calling add_path_action()")
 
+        # ----------------------------------
+        # Timed victim reporting setup
+        last_report_time = self.robot.getTime()
+        victim_count = 1
+        victim_types = ['U', 'S', 'H']
+        hazard_tag_list = ['Flammable Gas', 'Poission', 'Organic Peroxide', 'Corrosive']
+        hazard_tag = random.choice(hazard_tag_list)
+        urgency_msg = None
+        count = len(self.path_follower.reported_hashes) + 1
+        # urgency_msg = self.path_follower.phrases_data["priorities"].get(type_code, {}).get("urgency", "No urgency message")
+
         # Fall back to normal navigation
         while self.robot.step(TIME_STEP) != -1 and not self.reached_target:
+            # ----------------------------------
+            current_time = self.robot.getTime()
+            # Timed victim reporting
+            if current_time - last_report_time > 10:
+                if current_time >= self.path_follower.report_audio_end_time:
+                    print(f"Reporting victim at time {current_time}")
+                    x, z = self.get_position()
+                    type_code = victim_types[(victim_count - 1) % len(victim_types)]
+                    
+                
+                    self.path_follower.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, None, count)
+                    print(f"[DEBUG] Timed victim report triggered at {current_time}")
+                    victim_count += 1
+                    last_report_time = current_time
+                # else:
+                #     print("[DEBUG] Skipping report: previous audio still playing")
+
+            # --------------------------------
             # Priority 1: Trap detection
             if not self.in_trap_sequence and self.detect_trap():
                 self.execute_trap_avoidance()

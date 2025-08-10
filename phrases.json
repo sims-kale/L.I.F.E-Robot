@@ -13,7 +13,7 @@
       "label": "Unharmed victim",
       "voice_lines": [
         "Victim appears stable but needs evacuation.",
-        "They're okay, but assistance would be helpful.",
+        "Victim is okay, but assistance would be helpful.",
         "Requesting escort for an uninjured survivor."
       ],
       "urgency": "Low urgency, but guidance required."
