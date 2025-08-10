@@ -131,7 +131,9 @@ class ErebusInference:
         self.path_following = False
         return path_completed
 
-    def report_victim(self, x_cm, z_cm, type_code, hazard_tag, urgency_msg,voice_message, count):
+    def report_victim(self, x_cm, z_cm, type_code, hazard_tag, urgency_msg,voice_message, victim_count):
+        print(f"---"*20)
+        print('Victim_Count:', victim_count)
         # with open(self.csv_path, mode='a', newline='') as file:
         #     writer = csv.writer(file)
         #     writer.writerow([
@@ -163,8 +165,8 @@ class ErebusInference:
 
         priority, message_line, urgency_msg = classify_priority(type_code)
         timestamp = datetime.now().strftime("%m/%d/%Y %H:%M")
-        area_code = f"Area_Code{count}"
-        zone = f"Zone-{(count % 3) + 1}"
+        area_code = f"Area_Code{victim_count}"
+        zone = f"Zone-{(victim_count % 3) + 1}"
 
         print(f"[COGNITIVE] Victim at ({x_m} m, {z_m} m) → {priority}")
         print(f"[DISTANCE] Proximity: {proximity_m} meters")
@@ -184,7 +186,7 @@ class ErebusInference:
         ]
         voice_message = " ".join([line for line in voice_lines if line])
 
-        mp3_path = os.path.join(self.audio_folder, f"report_{count}.mp3")
+        mp3_path = os.path.join(self.audio_folder, f"report_{victim_count}.mp3")
         tts = gTTS(text=voice_message, lang=self.language)
         tts.save(mp3_path)
         audio = MP3(mp3_path)
@@ -690,7 +692,7 @@ class ErebusController:
                     type_code = victim_types[(victim_count - 1) % len(victim_types)]
                     
                 
-                    self.path_follower.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, None, count)
+                    self.path_follower.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, None, victim_count)
                     print(f"[DEBUG] Timed victim report triggered at {current_time}")
                     victim_count += 1
                     last_report_time = current_time

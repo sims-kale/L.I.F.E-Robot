@@ -1,8 +1,4 @@
 X (m),Z (m),Type,Priority,Hazard,Proximity (m),Timestamp,Area_Code,Urgency_Message,Zone
--0.49,-0.4,U,Unharmed victim,Poission,0.0,08/10/2025 17:43,Area_Code1,"Low urgency, but guidance required.",Zone-2
--0.46,0.08,S,Stable victim,Poission,0.0,08/10/2025 17:43,Area_Code1,No immediate action required.,Zone-2
--0.5,0.19,H,Harmed victim,Poission,0.01,08/10/2025 17:44,Area_Code1,High priority situation. Act immediately.,Zone-2
--0.34,0.16,U,Unharmed victim,Poission,0.01,08/10/2025 17:44,Area_Code1,"Low urgency, but guidance required.",Zone-2
--0.42,0.21,S,Stable victim,Poission,0.0,08/10/2025 17:45,Area_Code1,No immediate action required.,Zone-2
--0.33,0.3,H,Harmed victim,Poission,0.0,08/10/2025 17:45,Area_Code1,High priority situation. Act immediately.,Zone-2
--0.34,0.36,U,Unharmed victim,Poission,0.0,08/10/2025 17:45,Area_Code1,"Low urgency, but guidance required.",Zone-2
+-0.49,-0.4,U,Unharmed victim,Poission,0.0,08/10/2025 17:53,Area_Code1,"Low urgency, but guidance required.",Zone-2
+-0.46,0.08,S,Stable victim,Poission,0.0,08/10/2025 17:53,Area_Code2,No immediate action required.,Zone-3
+-0.5,0.19,H,Harmed victim,Poission,0.01,08/10/2025 17:54,Area_Code3,High priority situation. Act immediately.,Zone-1
