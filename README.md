@@ -1,124 +1,76 @@
  **L.I.F.E** (**L**ocationg **I**ndividuals **F**or **E**vacuation) **Robot**
-## Rescue Voice Reporter 
+# Rescue Robot Project – Technical Instructions
 
-A **trust-aware**, **emotionally adaptive**, and **cognitively intelligent** reporting system for rescue robots built in **Webots**. This system uses realistic voice reporting (via gTTS), dynamic emotional templates, hazard warnings, and detailed structured logging for each victim encounter.
+## Prerequisites
+1. **Install Webots** (version: R2023b).
+2. **Download the Erebus Rescue Simulation environment** from the official source.
+   [erebus-25.0.1.zip](https://github.com/user-attachments/files/21799569/erebus-25.0.1.1.zip)
 
----
-
-## 📌 Features
-
-- ✅ **Cognitive Victim Classification** (Harmed, Unharmed, Stable)
-- ✅ **Emotionally Humanized Voice Reports** using dynamic messages
-- ✅ **Hazard Detection & Alerts** (Flammable Gas, Corrosive, etc.)
-- ✅ **Speaker Audio Playback using GTTS + Mutagen**
-- ✅ **Distance Calculation in Meters** using GPS coordinates
-- ✅ **Redundancy Avoidance** via hash-based position memory
-- ✅ **Structured CSV Logging** with:
-  - Victim coordinates
-  - Type and Priority
-  - Hazard type
-  - Proximity to robot (m)
-  - Timestamp
-  - `Area_Code`, `Urgency_Message`, and `Zone`
-- ✅ **Multilingual Support** (Expandable via gTTS)
-- ✅ **Emotional Message Pool** loaded from external `.json`
+4. **Ensure the Erebus environment is extracted and ready** on your local machine.
 
 ---
 
-## 📁 Project Structure
+## Folder Setup
+1. Clone or download this repository.
+2. Rename the repository folder to **`reports`**.
+3. Move the renamed **`reports`** folder into the main **Erebus Rescue Simulation** project directory so it sits alongside `docs`, `game`, and `player_controllers`.
+
+**Expected final directory structure:**
 
 ```
 
-project/
-├── reports_audio/                 # Saved voice reports (MP3)
-├── victim_report.csv              # Victim logs
-├── phrases.json                   # Emotion templates
-├── reporting_controller.py        # Controller logic
-└── README.md                      # This file
+Erebus Rescue Simulation/
+│
+├── docs/
+├── game/
+├── player_controllers/
+├── L.I.F.E-Robot/   ← Our Project Code
+├── .gitignore
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+└── README.md
+```
+---
 
+## Running the Project
+1. Launch **Webots**.
+2. Open the world file:
+
+```
+/game/worlds/world1.wbt
 ````
+3. In the **Competition Controller** panel on the left:
+- Click **LOAD**.
+- Select the main controller file from:
+
+ ```
+/L.I.F.E-Robot/V2.py
+  ```
+4. Wait until the **LOAD** button changes to **orange**.
+5. Click **Start** to begin the simulation.
 
 ---
 
-## ⚙️ Requirements
-
-Install the required Python packages:
-
-```bash
-pip install gTTS mutagen
-````
+## Simulation Controls
+- **Pause** → Temporarily stop the robot.
+- **Restart** → Respawn the robot at the last checkpoint.
+- **Reset** → Restart the entire simulation and reload code.
+- **Settings** → Toggle debugging options.
 
 ---
 
-## 🧪 Testing
-
-The code includes a test list of victims with varying hazard types and positions. During simulation, victims are reported every 4 seconds. The robot will:
-
-* Announce victim condition, hazard, and distance.
-* Save voice report to `.mp3`.
-* Log information to `victim_report.csv`.
+## Manual Robot Movement (Optional)
+- Click the robot in the simulation window → red, blue, and green arrows appear.
+- Drag to reposition the robot (only after starting the simulation).
 
 ---
 
-## 🧠 Emotional Voice Reporting
+## Common Issues & Fixes
+**Competition Supervisor Not Visible:**
+1. Go to **Tools → Scene Tree**.
+2. Expand and locate **`DEF MAINSUPERVISOR Robot`**.
+3. Right-click → **Show Robot Window**.
 
-**Emotion templates** for victim messages are stored in an external JSON file `phrases.json`. Example format:
-
-```json
-{
-  "H": ["Critical harm detected.", "Severe injuries observed."],
-  "U": ["Victim is okay, needs guidance."],
-  "S": ["Monitoring ongoing."]
-}
-```
-
-Modify or expand this file to change tone, emotion, or social phrasing.
-
----
-
-## 🌍 Multilingual Support
-
-By default, the system speaks English:
-
-```python
-language = 'en'  # To support other languages, change to 'es', 'fr', etc.
-```
-
-Available options depend on [gTTS supported languages](https://gtts.readthedocs.io/en/latest/module.html#available-languages).
-Just change the `language` value to your desired language code.
-
----
-
-## 🔧 Changing File Paths (IMPORTANT)
-
-Update the following variables in your code to match your local directory structure:
-
-```python
-# Audio output folder for voice reports
-audio_folder = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/reports_audio"
-os.makedirs(audio_folder, exist_ok=True)
-
-# CSV report logging
-csv_path = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/victim_report.csv"
-
-# Emotional phrases loaded from JSON
-with open(r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/player_controllers/phrases.json", "r") as f:
-    phrases_data = json.load(f)
-```
-
-> ⚠️ Use **raw string (`r"..."`) format** for Windows paths to avoid backslash errors.
-
----
-
-## 🎯 Research Extensions
-
-* Add tone adaptation for urgency using pitch & speed modifiers
-* Enable multilingual switching during runtime
-* Integrate with path-planning and hazard avoidance
-* Add trust-awareness logic to prioritize known vs unknown zones
-
----
-**Repository Purpose:** Academic Research & Rescue Robotics Simulation
 
 **Status:** 🚧 Actively Developing
 
