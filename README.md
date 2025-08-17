@@ -12,8 +12,7 @@
 
 ## Folder Setup
 1. Clone or download this repository.
-2. Rename the repository folder to **`reports`**.
-3. Move the renamed **`reports`** folder into the main **Erebus Rescue Simulation** project directory so it sits alongside `docs`, `game`, and `player_controllers`.
+3. Move the downloaded folder into the main **Erebus Rescue Simulation** project directory so it sits alongside `docs`, `game`, and `player_controllers`.
 
 **Expected final directory structure:**
 
