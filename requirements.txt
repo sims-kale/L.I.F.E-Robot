@@ -1,0 +1,6 @@
+gTTS
+mutagen
+webots
+keras
+tensorflow
+numpy
