@@ -1,0 +1,6 @@
+.ipynb_checkpoints
+F
+H
+P
+S
+U

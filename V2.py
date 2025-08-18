@@ -104,13 +104,21 @@ class ErebusInference:
             # Continue with empty path data
 
 
-        # ---------------------------------------
+        # ------SEEMA------
 
         self.speaker = self.robot.getDevice("speaker")
         self.language = 'en'
         self.report_audio_end_time = 0 
         self.audio_folder = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/reports_audio"
         os.makedirs(self.audio_folder, exist_ok=True)
+        # Clean the report audio folder at startup
+        for filename in os.listdir(self.audio_folder):
+            file_path = os.path.join(self.audio_folder, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}: {e}")
         self.csv_path = r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/victim_report.csv"
         self.reported_hashes = set()
         with open(r"D:/SHU/AI_RDP/erebus-25.0.0 (1)/erebus-25.0.0/reports/phrases.json", "r") as f:
@@ -195,7 +203,7 @@ class ErebusInference:
         self.report_audio_end_time = self.robot.getTime() + duration
         # time.sleep(duration)
 
-        # ------------------------------------
+        # ----SHEEMA
 
     def save_path(self):
         """Save the current path data to the JSON file"""
@@ -235,14 +243,14 @@ class ErebusInference:
         # last_report_time = self.robot.getTime()
         # victim_count = 1
         # while self.robot.step(self.timestep) != -1 and not self.reached_target:
-        # --------------------------------------
+        # -----SEEMA----
         last_report_time = self.robot.getTime()
         victim_count = 1
-        victim_types = ['U', 'S', 'M']  # Add more types as needed
+        victim_types = ['U', 'S', 'H']
         while self.robot.step(self.timestep) != -1 and not self.reached_target:
             current_time = self.robot.getTime()
-            # Report a different victim type every 10 seconds
-            if current_time - last_report_time > 10:
+
+            if current_time - last_report_time >20:
                 x, z = self.get_position()
                 type_code = victim_types[(victim_count - 1) % len(victim_types)]
                 hazard_tag = None
@@ -250,7 +258,7 @@ class ErebusInference:
                 self.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, victim_count)
                 victim_count += 1
                 last_report_time = current_time
-            # -------------------------------------
+            #  -------SHEEMA------
             if self.path_index >= len(self.path_data['path']):
                 print("Path completed!")
                 self.left_motor.setVelocity(0)
@@ -559,7 +567,7 @@ class ErebusController:
         #     print("VICTIM REPORTED - CONTINUING")
         #     return True
 
-        # -----------------------------------
+        # -------SEEMA--------
         if self.detect_victim() and not self.victim_reported:
             print("VICTIM DETECTED! Reporting...")
             self.stop()
@@ -575,7 +583,6 @@ class ErebusController:
             self.victim_reported = True
             print("VICTIM REPORTED - CONTINUING")
             return True
-        # ----------------------------------
         
         self.victim_reported = False
         
@@ -592,6 +599,8 @@ class ErebusController:
                 self.move(MAX_VELOCITY * 0.8, MAX_VELOCITY)  # Parallel
         
         return True
+    
+        # ------SHEEMA------
 
     def move(self, left_speed, right_speed, steps=1):
         self.left_motor.setVelocity(left_speed)
@@ -669,27 +678,28 @@ class ErebusController:
             print("No path steps available, using normal navigation")
             print("You can record a path by calling add_path_action()")
 
-        # ----------------------------------
+        # -------SEEMA-------
         # Timed victim reporting setup
         last_report_time = self.robot.getTime()
         victim_count = 1
         victim_types = ['U', 'S', 'H']
         hazard_tag_list = ['Flammable Gas', 'Poission', 'Organic Peroxide', 'Corrosive']
-        hazard_tag = random.choice(hazard_tag_list)
+        
         urgency_msg = None
         count = len(self.path_follower.reported_hashes) + 1
         # urgency_msg = self.path_follower.phrases_data["priorities"].get(type_code, {}).get("urgency", "No urgency message")
 
         # Fall back to normal navigation
         while self.robot.step(TIME_STEP) != -1 and not self.reached_target:
-            # ----------------------------------
+            # ------SEEMA---------
             current_time = self.robot.getTime()
             # Timed victim reporting
-            if current_time - last_report_time > 10:
+            if current_time - last_report_time > 20:
                 if current_time >= self.path_follower.report_audio_end_time:
                     print(f"Reporting victim at time {current_time}")
                     x, z = self.get_position()
                     type_code = victim_types[(victim_count - 1) % len(victim_types)]
+                    hazard_tag = random.choice(hazard_tag_list)
                     
                 
                     self.path_follower.report_victim(x * 100, z * 100, type_code, hazard_tag, urgency_msg, None, victim_count)
@@ -699,7 +709,7 @@ class ErebusController:
                 # else:
                 #     print("[DEBUG] Skipping report: previous audio still playing")
 
-            # --------------------------------
+            # --------SHEEMA----------
             # Priority 1: Trap detection
             if not self.in_trap_sequence and self.detect_trap():
                 self.execute_trap_avoidance()
